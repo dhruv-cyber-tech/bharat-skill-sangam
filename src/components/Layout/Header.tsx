@@ -1,9 +1,14 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Search, Menu, X, User, Bell } from "lucide-react";
+import { Search, Menu, X, User, Bell, LogOut } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { user, profile, signOut } = useAuth();
+  const navigate = useNavigate();
 
   return (
     <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
@@ -39,13 +44,44 @@ const Header = () => {
 
         {/* Desktop Actions */}
         <div className="hidden md:flex items-center space-x-4">
-          <Button variant="ghost" size="icon">
-            <Bell className="w-5 h-5" />
-          </Button>
-          <Button variant="ghost" size="icon">
-            <User className="w-5 h-5" />
-          </Button>
-          <Button variant="hero" size="lg">Become a Guru</Button>
+          {user ? (
+            <>
+              <Button variant="ghost" size="icon">
+                <Bell className="w-5 h-5" />
+              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon">
+                    <User className="w-5 h-5" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuItem className="flex flex-col items-start">
+                    <div className="font-medium">{profile?.full_name || user.email}</div>
+                    <div className="text-xs text-muted-foreground capitalize">
+                      {profile?.user_role || 'User'}
+                    </div>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={signOut}>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Sign out</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              {profile?.user_role !== 'guru' && (
+                <Button variant="hero" size="lg">Become a Guru</Button>
+              )}
+            </>
+          ) : (
+            <>
+              <Button variant="outline" onClick={() => navigate('/auth')}>
+                Sign In
+              </Button>
+              <Button variant="hero" size="lg" onClick={() => navigate('/auth')}>
+                Join Now
+              </Button>
+            </>
+          )}
         </div>
 
         {/* Mobile Menu Button */}
@@ -78,8 +114,31 @@ const Header = () => {
               <a href="#" className="text-foreground hover:text-primary transition-colors py-2">GramSeva</a>
             </nav>
             <div className="flex flex-col space-y-3 pt-4 border-t border-border">
-              <Button variant="outline" size="lg" className="w-full">Sign In</Button>
-              <Button variant="hero" size="lg" className="w-full">Become a Guru</Button>
+              {user ? (
+                <>
+                  <div className="text-sm text-foreground">
+                    <div className="font-medium">{profile?.full_name || user.email}</div>
+                    <div className="text-xs text-muted-foreground capitalize">
+                      {profile?.user_role || 'User'}
+                    </div>
+                  </div>
+                  <Button variant="outline" size="lg" className="w-full" onClick={signOut}>
+                    Sign Out
+                  </Button>
+                  {profile?.user_role !== 'guru' && (
+                    <Button variant="hero" size="lg" className="w-full">Become a Guru</Button>
+                  )}
+                </>
+              ) : (
+                <>
+                  <Button variant="outline" size="lg" className="w-full" onClick={() => navigate('/auth')}>
+                    Sign In
+                  </Button>
+                  <Button variant="hero" size="lg" className="w-full" onClick={() => navigate('/auth')}>
+                    Join Now
+                  </Button>
+                </>
+              )}
             </div>
           </div>
         </div>
