@@ -2,32 +2,58 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Search, Menu, X, User, Bell, LogOut } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
-import { useNavigate } from "react-router-dom";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { useNavigate, Link } from "react-router-dom"; // Import Link
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { user, profile, signOut } = useAuth();
+  const { user, profile, signOut, loading } = useAuth();
   const navigate = useNavigate();
 
   return (
     <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
         {/* Logo */}
-        <div className="flex items-center space-x-2">
+        <Link to="/" className="flex items-center space-x-2">
           <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center">
             <span className="text-white font-bold text-sm">BS</span>
           </div>
           <span className="font-bold text-xl text-foreground">BharatSkill</span>
           <span className="text-primary font-semibold">Connect</span>
-        </div>
+        </Link>
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center space-x-8">
-          <a href="#" className="text-foreground hover:text-primary transition-colors">Browse Skills</a>
-          <a href="#" className="text-foreground hover:text-primary transition-colors">Find Gurus</a>
-          <a href="#" className="text-foreground hover:text-primary transition-colors">Workshops</a>
-          <a href="#" className="text-foreground hover:text-primary transition-colors">GramSeva</a>
+          <Link
+            to="/skills" // Example link
+            className="text-foreground hover:text-primary transition-colors"
+          >
+            Browse Skills
+          </Link>
+          <Link
+            to="/gurus" // Example link
+            className="text-foreground hover:text-primary transition-colors"
+          >
+            Find Gurus
+          </Link>
+          <Link
+            to="/workshops" // Example link
+            className="text-foreground hover:text-primary transition-colors"
+          >
+            Workshops
+          </Link>
+          <Link
+            to="/gramseva" // Changed from <a> to <Link>
+            className="text-foreground hover:text-primary transition-colors"
+          >
+            GramSeva
+          </Link>
         </nav>
 
         {/* Search Bar - Desktop */}
@@ -44,7 +70,9 @@ const Header = () => {
 
         {/* Desktop Actions */}
         <div className="hidden md:flex items-center space-x-4">
-          {user ? (
+          {loading ? (
+            <Skeleton className="h-8 w-24" />
+          ) : user && profile ? (
             <>
               <Button variant="ghost" size="icon">
                 <Bell className="w-5 h-5" />
@@ -56,28 +84,40 @@ const Header = () => {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-56">
-                  <DropdownMenuItem className="flex flex-col items-start">
-                    <div className="font-medium">{profile?.full_name || user.email}</div>
-                    <div className="text-xs text-muted-foreground capitalize">
-                      {profile?.user_role || 'User'}
-                    </div>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={signOut}>
-                    <LogOut className="mr-2 h-4 w-4" />
-                    <span>Sign out</span>
-                  </DropdownMenuItem>
+                  {profile ? (
+                    <>
+                      <DropdownMenuItem className="flex flex-col items-start">
+                        <div className="font-medium">
+                          {profile.full_name || user.email}
+                        </div>
+                        <div className="text-xs text-muted-foreground capitalize">
+                          {profile.user_role || "User"}
+                        </div>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={signOut}>
+                        <LogOut className="mr-2 h-4 w-4" />
+                        <span>Sign out</span>
+                      </DropdownMenuItem>
+                    </>
+                  ) : (
+                    <DropdownMenuItem>
+                      <Skeleton className="h-5 w-full" />
+                    </DropdownMenuItem>
+                  )}
                 </DropdownMenuContent>
               </DropdownMenu>
-              {profile?.user_role !== 'guru' && (
-                <Button variant="hero" size="lg">Become a Guru</Button>
+              {profile.user_role !== "guru" && (
+                <Button variant="hero" size="lg">
+                  Become a Guru
+                </Button>
               )}
             </>
           ) : (
             <>
-              <Button variant="outline" onClick={() => navigate('/auth')}>
+              <Button variant="outline" onClick={() => navigate("/auth")}>
                 Sign In
               </Button>
-              <Button variant="hero" size="lg" onClick={() => navigate('/auth')}>
+              <Button variant="hero" size="lg" onClick={() => navigate("/auth")}>
                 Join Now
               </Button>
             </>
@@ -91,7 +131,11 @@ const Header = () => {
           className="md:hidden"
           onClick={() => setIsMenuOpen(!isMenuOpen)}
         >
-          {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          {isMenuOpen ? (
+            <X className="w-6 h-6" />
+          ) : (
+            <Menu className="w-6 h-6" />
+          )}
         </Button>
       </div>
 
@@ -108,33 +152,52 @@ const Header = () => {
               />
             </div>
             <nav className="flex flex-col space-y-3">
-              <a href="#" className="text-foreground hover:text-primary transition-colors py-2">Browse Skills</a>
-              <a href="#" className="text-foreground hover:text-primary transition-colors py-2">Find Gurus</a>
-              <a href="#" className="text-foreground hover:text-primary transition-colors py-2">Workshops</a>
-              <a href="#" className="text-foreground hover:text-primary transition-colors py-2">GramSeva</a>
+              <Link to="/skills" className="text-foreground hover:text-primary transition-colors py-2">Browse Skills</Link>
+              <Link to="/gurus" className="text-foreground hover:text-primary transition-colors py-2">Find Gurus</Link>
+              <Link to="/workshops" className="text-foreground hover:text-primary transition-colors py-2">Workshops</Link>
+              <Link to="/gramseva" className="text-foreground hover:text-primary transition-colors py-2">GramSeva</Link>
             </nav>
             <div className="flex flex-col space-y-3 pt-4 border-t border-border">
               {user ? (
                 <>
                   <div className="text-sm text-foreground">
-                    <div className="font-medium">{profile?.full_name || user.email}</div>
+                    <div className="font-medium">
+                      {profile?.full_name || user.email}
+                    </div>
                     <div className="text-xs text-muted-foreground capitalize">
-                      {profile?.user_role || 'User'}
+                      {profile?.user_role || "User"}
                     </div>
                   </div>
-                  <Button variant="outline" size="lg" className="w-full" onClick={signOut}>
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    className="w-full"
+                    onClick={signOut}
+                  >
                     Sign Out
                   </Button>
-                  {profile?.user_role !== 'guru' && (
-                    <Button variant="hero" size="lg" className="w-full">Become a Guru</Button>
+                  {profile?.user_role !== "guru" && (
+                    <Button variant="hero" size="lg" className="w-full">
+                      Become a Guru
+                    </Button>
                   )}
                 </>
               ) : (
                 <>
-                  <Button variant="outline" size="lg" className="w-full" onClick={() => navigate('/auth')}>
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    className="w-full"
+                    onClick={() => navigate("/auth")}
+                  >
                     Sign In
                   </Button>
-                  <Button variant="hero" size="lg" className="w-full" onClick={() => navigate('/auth')}>
+                  <Button
+                    variant="hero"
+                    size="lg"
+                    className="w-full"
+                    onClick={() => navigate("/auth")}
+                  >
                     Join Now
                   </Button>
                 </>

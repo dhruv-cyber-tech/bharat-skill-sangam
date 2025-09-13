@@ -6,18 +6,24 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { supabase } from '@/integrations/supabase/client';
 import { Tables } from '@/integrations/supabase/types';
+import { Skeleton } from "@/components/ui/skeleton";
 
 const FeaturedSkills = () => {
   const [featuredSkills, setFeaturedSkills] = useState<Tables<'skills'>[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchSkills = async () => {
+      setLoading(true);
       const { data, error } = await supabase.from('skills').select('*').limit(6);
       if (error) {
         console.error('Error fetching skills:', error);
+        setError('Could not fetch the featured skills.');
       } else {
         setFeaturedSkills(data);
       }
+      setLoading(false);
     };
 
     fetchSkills();
@@ -37,12 +43,29 @@ const FeaturedSkills = () => {
           </p>
         </div>
 
+        {/* Loading and Error States */}
+        {loading && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="bg-card rounded-xl shadow-card border border-border p-6">
+                <Skeleton className="h-48 w-full mb-4" />
+                <Skeleton className="h-6 w-3/4 mb-2" />
+                <Skeleton className="h-4 w-1/2" />
+              </div>
+            ))}
+          </div>
+        )}
+
+        {error && <p className="text-center text-destructive">{error}</p>}
+
         {/* Skills Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-          {featuredSkills.map((skill) => (
-            <SkillCard key={skill.id} skill={skill} />
-          ))}
-        </div>
+        {!loading && !error && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+            {featuredSkills.map((skill) => (
+              <SkillCard key={skill.id} skill={skill} />
+            ))}
+          </div>
+        )}
 
         {/* View All Button */}
         <div className="text-center">
