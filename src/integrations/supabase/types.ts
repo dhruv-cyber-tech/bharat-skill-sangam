@@ -76,6 +76,63 @@ export type Database = {
           id?: string
         }
         Relationships: []
+      },
+      skills: {
+        Row: {
+          id: string
+          title: string
+          description: string | null
+          category: string | null
+          image: string | null
+          price: number | null
+          duration: string | null
+          group_size: number | null
+          guru_name: string | null
+          guru_avatar: string | null
+          guru_rating: number | null
+          guru_review_count: number | null
+          guru_location: string | null
+          guru_distance: string | null
+          tags: string[] | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          title: string
+          description?: string | null
+          category?: string | null
+          image?: string | null
+          price?: number | null
+          duration?: string | null
+          group_size?: number | null
+          guru_name?: string | null
+          guru_avatar?: string | null
+          guru_rating?: number | null
+          guru_review_count?: number | null
+          guru_location?: string | null
+          guru_distance?: string | null
+          tags?: string[] | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          title?: string
+          description?: string | null
+          category?: string | null
+          image?: string | null
+          price?: number | null
+          duration?: string | null
+          group_size?: number | null
+          guru_name?: string | null
+          guru_avatar?: string | null
+          guru_rating?: number | null
+          guru_review_count?: number | null
+          guru_location?: string | null
+          guru_distance?: string | null
+          tags?: string[] | null
+          created_at?: string
+        }
+        Relationships: []
       }
     }
     Views: {
